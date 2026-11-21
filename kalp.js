@@ -41,7 +41,17 @@
   }
 
   // ---------- Gönderme: dokunuşlar 2,5 sn toplanıp tek mesajla gider ----------
+  // Aynı anda dokunma: iki taraf 10 sn içinde dokunursa iki ekranda kutlama
+  var lastTap = 0, lastRecv = 0, lastCele = 0;
+  function together() {
+    if (Date.now() - lastCele < 60000) return;
+    lastCele = Date.now();
+    if (window.BUGUN) BUGUN.ayniAn();
+  }
   function tap() {
+    lastTap = Date.now();
+    if (lastTap - lastRecv < 10000) together();
+    if (window.BUGUN) BUGUN.aktif();
     pending++;
     clearTimeout(timer); timer = setTimeout(flush, 2500);
   }
@@ -92,6 +102,8 @@
       var keys = Object.keys(k.gelen); if (keys.length > DAY_KEEP) keys.slice(0, keys.length - DAY_KEEP).forEach(function (x) { delete k.gelen[x]; });
       B.save(); paint();
       if (m.time * 1000 > Date.now() - 90000) {
+        lastRecv = Date.now();
+        if (lastRecv - lastTap < 10000) together();
         toast("💗 " + name(d.k) + " şu an seni düşünüyor");
         var el = B.app.querySelector("#heart"); if (el) B.hearts(el);
         try { if (navigator.vibrate) navigator.vibrate([40, 60, 40]); } catch (x) {}
@@ -120,6 +132,7 @@
     connect();
     var el = B.app.querySelector("#lv2");
     if (!el) return;
+    if (window.BUGUN && B.app.querySelector("#hafta")) BUGUN.refresh();
     var n = st.kalp.gelen[dayKey(Date.now())] || 0;
     el.textContent = n ? name(other()) + " bugün seni " + n + " kez düşündü 💗" : name(other()) + " seni düşündüğünde burada görünecek 🌸";
     // Telefonun sahibini değiştirme: başlığa 5 kez dokun ya da 1,5 sn basılı tut

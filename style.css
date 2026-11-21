@@ -287,3 +287,118 @@ h1, h2, h3 { margin: 0; line-height: 1.2; }
 .overlay > b { font-size: 90px; color: var(--pink-deep); font-weight: 800; }
 .ov-card { background: #fff; border-radius: 22px; padding: 20px; box-shadow: var(--shadow); text-align: center; width: 85%; display: grid; gap: 10px; }
 .toast { position: fixed; left: 50%; top: 20px; transform: translateX(-50%); background: var(--pink-deep); color: #fff; padding: 10px 18px; border-radius: 999px; z-index: 90; font-weight: 800; }
+
+/* ================= Yenileme (2026-11-21): daha sade ve düzenli görünüm ================= */
+:root {
+  --shadow: 0 1px 2px rgba(74, 43, 56, .05), 0 10px 28px rgba(224, 96, 126, .10);
+  --radius: 24px;
+  --grad: linear-gradient(135deg, #ff9ab8 0%, #f06c94 55%, #d9507a 100%);
+}
+body { font-size: 16px; letter-spacing: .005em; }
+.card { border: 1px solid rgba(246, 211, 223, .75); padding: 20px; margin-bottom: 12px; }
+.card h2 { font-size: 12px; letter-spacing: .14em; color: var(--pink-deep); opacity: .9; margin-bottom: 12px; }
+.sec { display: flex; align-items: center; gap: 10px; font-size: 13px; letter-spacing: .14em; margin: 26px 4px 12px; color: var(--muted); }
+.sec::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+/* Üst bölüm */
+.top { margin: 2px 2px 14px; }
+.top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.date { font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.seri { font-size: 14px; padding: 5px 12px; border-radius: 999px; background: var(--card); box-shadow: var(--shadow); color: var(--muted); font-weight: 700; filter: grayscale(.6); }
+.seri.lit { filter: none; color: #e8590c; background: #fff1e6; }
+.hello { margin: 0; }
+.moment { margin: 10px 0 0; padding: 10px 14px; border-radius: 16px; background: rgba(255, 255, 255, .6); color: var(--text); font-weight: 600; font-size: 15px;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(246, 211, 223, .6); }
+.moment:empty { display: none; }
+
+/* Birlikte: ana kart */
+.together { background: var(--grad); color: #fff; border: none; box-shadow: 0 14px 34px rgba(224, 96, 126, .35); }
+.together h2 { color: rgba(255, 255, 255, .85); }
+.together .num { background: rgba(255, 255, 255, .2); color: #fff; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.together .tick { color: #fff; opacity: .95; }
+.together .since { color: rgba(255, 255, 255, .85); }
+.together::after { content: "🌼"; position: absolute; right: -10px; top: -14px; font-size: 90px; opacity: .14; transform: rotate(18deg); }
+
+.count.slim { display: flex; align-items: center; gap: 14px; text-align: left; padding: 14px 18px; background: linear-gradient(135deg, #fff, #fff3f7); color: var(--text); }
+.count.slim h2 { color: var(--pink-deep); margin-bottom: 2px; }
+.count.slim .pin { font-size: 28px; }
+
+/* Kalp */
+.heart-btn { width: 104px; height: 104px; font-size: 48px; transition: transform .15s; animation: beat 2.4s ease-in-out infinite; }
+@keyframes beat { 0%, 100% { transform: scale(1); } 10% { transform: scale(1.07); } 20% { transform: scale(1); } 30% { transform: scale(1.05); } }
+
+/* Karşı tarafın ruh hâli */
+.their-mood { display: flex; align-items: center; gap: 12px; padding: 10px 14px; margin-bottom: 12px; border-radius: 16px; background: var(--cream); border: 1px dashed var(--rose); }
+.their-mood > span { font-size: 30px; }
+.their-mood small { display: block; color: var(--muted); font-size: 12px; font-weight: 700; }
+.their-mood b { font-size: 16px; }
+.mood { transition: transform .12s; }
+.mood:active { transform: scale(.95); }
+
+/* Günün kartı */
+.kart-in { position: relative; border-radius: 18px; overflow: hidden; min-height: 150px; }
+.kart-face { min-height: 150px; padding: 18px 16px; display: grid; justify-items: center; align-content: center; gap: 4px; text-align: center; background: var(--cream); border: 2px dashed var(--rose); border-radius: 18px; }
+.kart-ico { font-size: 38px; }
+.kart-face small { font-weight: 800; color: var(--pink-deep); letter-spacing: .08em; text-transform: uppercase; font-size: 11px; }
+.kart-face p { margin: 4px 0 0; font-size: 17px; font-weight: 600; line-height: 1.45; }
+.hint { margin: 10px 0 0; }
+
+/* Ortak görev */
+.gorev-row { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+.gorev-ico { font-size: 34px; flex: none; width: 56px; height: 56px; display: grid; place-items: center; border-radius: 16px; background: var(--rose); }
+.gorev-row p { margin: 0; font-size: 17px; font-weight: 600; line-height: 1.4; }
+.chips { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.chip { padding: 6px 12px; border-radius: 999px; background: #f6eef2; color: var(--muted); font-weight: 800; font-size: 13px; }
+.chip.ok { background: #e3f6ea; color: #2f8a52; }
+.done-line { margin: 0; text-align: center; font-weight: 800; color: #2f8a52; }
+
+/* Haftalık karne */
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tile { background: var(--cream); border-radius: 16px; padding: 10px 6px; display: grid; justify-items: center; text-align: center; gap: 0; }
+.tile span { font-size: 20px; }
+.tile b { font-size: 22px; font-weight: 800; line-height: 1.2; color: var(--pink-dark); }
+.tile small { font-size: 11px; color: var(--muted); font-weight: 700; line-height: 1.25; }
+.moods-week { display: grid; gap: 4px; margin-top: 12px; font-weight: 700; font-size: 14px; }
+.hafta .muted { margin: 12px 0 0; }
+
+/* Kutlama */
+.celebrate { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; background: rgba(255, 230, 238, .72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: fadein .3s; }
+.celebrate.out { opacity: 0; transition: opacity .4s; }
+.cele-box { text-align: center; display: grid; gap: 8px; padding: 26px 30px; background: #fff; border-radius: 28px; box-shadow: 0 20px 50px rgba(224, 96, 126, .35); animation: pop .4s cubic-bezier(.2, 1.6, .4, 1); }
+.cele-ico { font-size: 72px; }
+.cele-box b { font-size: 22px; color: var(--pink-deep); }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } }
+
+/* Saate göre arka plan */
+body.t-sabah { --bg2: #fff0d9; }
+body.t-aksam { --bg2: #ffdcd6; }
+body.t-gece {
+  --bg: #1d1124; --bg2: #3b1d45; --card: #2b1833; --text: #f6e7ef; --muted: #c4a2b6; --line: #4a2c55; --rose: #4d2846; --cream: #33203d;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px rgba(0, 0, 0, .35);
+  background: radial-gradient(1px 1px at 20% 12%, #fff8 50%, transparent 51%), radial-gradient(1.5px 1.5px at 70% 8%, #fff9 50%, transparent 51%),
+    radial-gradient(1px 1px at 85% 30%, #fff6 50%, transparent 51%), radial-gradient(1.5px 1.5px at 35% 40%, #fff5 50%, transparent 51%),
+    radial-gradient(120% 60% at 50% 0%, var(--bg2) 0%, var(--bg) 60%) fixed, var(--bg);
+}
+body.t-gece .card { border-color: rgba(255, 255, 255, .06); }
+body.t-gece .together { box-shadow: 0 14px 34px rgba(0, 0, 0, .4); }
+body.t-gece .count.slim { background: var(--card); }
+body.t-gece .moment { background: rgba(255, 255, 255, .06); border-color: rgba(255, 255, 255, .08); }
+body.t-gece .seri { background: var(--card); }
+body.t-gece .seri.lit { background: #4a2a1c; color: #ffb37a; }
+body.t-gece .mood, body.t-gece .q-opt, body.t-gece .sizes button, body.t-gece .todo button, body.t-gece .add input, body.t-gece .join input,
+body.t-gece .soru textarea, body.t-gece .gcard, body.t-gece .letter, body.t-gece .past button, body.t-gece .back { background: var(--card); color: var(--text); border-color: var(--line); }
+body.t-gece .mood.on { background: var(--rose); }
+body.t-gece .ans { background: var(--rose); }
+body.t-gece .ans:nth-child(2) { background: #3d2d1c; }
+body.t-gece .chip { background: #3a2442; }
+body.t-gece .chip.ok { background: #1f3a2a; color: #8fe0aa; }
+body.t-gece .done-line { color: #8fe0aa; }
+body.t-gece .soru .q { color: var(--text); }
+body.t-gece .tile b { color: #ffb3c9; }
+body.t-gece .tabbar { background: rgba(43, 24, 51, .9); }
+body.t-gece .paper { background: var(--cream) repeating-linear-gradient(transparent 0 33px, #45294f 33px 34px); }
+body.t-gece .note-title, body.t-gece .sign { color: #ffb3c9; }
+body.t-gece .cele-box { background: var(--card); }
+body.t-gece .celebrate { background: rgba(29, 17, 36, .7); }
+body.t-gece .lock input { background: var(--card); }
+.count:not(.slim) h2 { color: rgba(255, 255, 255, .9); }

@@ -145,16 +145,18 @@
 
   R.home = function () {
     var idx = dayIndex(), notes = C.gunluk || [];
-    var h = '<div class="hello fade">' + flower(54) + '<div><h1 class="script">' + greeting() + ' ' + esc(C.ad) + '</h1>' +
-      '<p>' + esc(C.alt_yazi || "Bugün de aklımdasın.") + '</p></div></div>';
+    var date = new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" });
+    var h = '<header class="top fade"><div class="top-row"><span class="date">' + esc(date) + '</span><span class="seri" id="seri"></span></div>' +
+      '<div class="hello">' + flower(54) + '<div><h1 class="script">' + greeting() + ' ' + esc(C.ad) + '</h1>' +
+      '<p>' + esc(C.alt_yazi || "Bugün de aklımdasın.") + '</p></div></div><p class="moment" id="an"></p></header>';
 
     // Birlikte kaç gün
     if (C.tanisma) h += '<div class="card together fade" id="together">' + togetherHtml() + '</div>';
 
     // Buluşma sayacı
     if (C.bulusma && !C.bulusma.tarih && C.bulusma.yer) {
-      h += '<div class="card count fade"><h2>Bir sonraki durağımız</h2><div class="note-title" style="color:#fff;font-size:40px">' +
-        esc(C.bulusma.yer) + '</div><div class="where">Orada kavuşacağız 💞</div></div>';
+      h += '<div class="card count slim fade"><span class="pin">📍</span><div><h2>Bir sonraki durağımız</h2><b>' +
+        esc(C.bulusma.yer) + '</b> · Orada kavuşacağız 💞</div></div>';
     }
     if (C.bulusma && C.bulusma.tarih) {
       var diff = new Date(C.bulusma.tarih).getTime() - Date.now();
@@ -169,7 +171,27 @@
       }
     }
 
-    // Günün notu
+    // ---- Şimdi ----
+    h += '<div class="sec">Şimdi</div>';
+    var lv = state.love[todayKey()] || 0;
+    h += '<div class="card love fade"><h2>Beni düşündüğünde dokun</h2><button class="heart-btn" id="heart">💗</button>' +
+      '<p class="muted" id="lv">' + (lv ? "Bugün " + lv + " kez 💕" : "Her dokunuşun kalbime ulaşıyor") + '</p><p class="from-love" id="lv2"></p></div>';
+    var moods = C.ruh_halleri || [];
+    if (moods.length) {
+      var mk = state.mood[todayKey()];
+      h += '<div class="card fade"><h2>Bugün nasılsın?</h2><div id="onunMood"></div><div class="moods">' + moods.map(function (m, i) {
+        return '<button class="mood' + (mk === i ? " on" : "") + '" data-mood="' + i + '"><span>' + esc(m.ikon) + '</span><small>' + esc(m.ad) + '</small></button>';
+      }).join("") + '</div>';
+      if (mk !== undefined && moods[mk]) {
+        h += '<div class="mood-msg fade">' + esc(moods[mk].mesaj) + '</div>';
+        if (C.whatsapp) h += '<a class="btn soft wa" target="_blank" rel="noopener" href="https://wa.me/' + esc(C.whatsapp) + '?text=' +
+          encodeURIComponent("Bugün kendimi " + moods[mk].ad.toLocaleLowerCase("tr") + " hissediyorum " + moods[mk].ikon) + '">💬 ' + esc(C.benim_adim || "Ona") + '\'ya haber ver</a>';
+      }
+      h += '</div>';
+    }
+
+    // ---- Bugünün sürprizleri ----
+    h += '<div class="sec">Bugünün sürprizleri</div>';
     if (idx < 0) {
       h += '<div class="card note-card center fade"><div class="env">🌷</div><p class="locked-note">İlk notun ' + (-idx) + ' gün sonra açılacak.</p></div>';
     } else if (notes.length) {
@@ -181,30 +203,15 @@
         h += noteHtml(n);
       }
       h += '</div>';
+    }
+    h += '<div class="card kart fade" id="kart"></div><div class="card gorev fade" id="gorev"></div><div class="card soru fade" id="soru"></div>';
+    if (idx >= 0 && notes.length) {
       if (idx >= notes.length) h += '<p class="locked-note">Yeni notlar yolda 🌸</p>';
-      else if (idx + 1 < notes.length) h += '<p class="locked-note">Yarın yeni bir not seni bekliyor 🌼</p>';
+      else if (idx + 1 < notes.length) h += '<p class="locked-note">Yarın yeni bir not ve yeni sürprizler seni bekliyor 🌼</p>';
     }
 
-    // Bugün nasılsın?
-    var moods = C.ruh_halleri || [];
-    if (moods.length) {
-      var mk = state.mood[todayKey()];
-      h += '<div class="card fade"><h2>Bugün nasılsın?</h2><div class="moods">' + moods.map(function (m, i) {
-        return '<button class="mood' + (mk === i ? " on" : "") + '" data-mood="' + i + '"><span>' + esc(m.ikon) + '</span><small>' + esc(m.ad) + '</small></button>';
-      }).join("") + '</div>';
-      if (mk !== undefined && moods[mk]) {
-        h += '<div class="mood-msg fade">' + esc(moods[mk].mesaj) + '</div>';
-        if (C.whatsapp) h += '<a class="btn soft wa" target="_blank" rel="noopener" href="https://wa.me/' + esc(C.whatsapp) + '?text=' +
-          encodeURIComponent("Bugün kendimi " + moods[mk].ad.toLocaleLowerCase("tr") + " hissediyorum " + moods[mk].ikon) + '">💬 ' + esc(C.benim_adim || "Ona") + '\'ya haber ver</a>';
-      }
-      h += '</div>';
-    }
-
-    // Seni düşünüyorum
-    var lv = state.love[todayKey()] || 0;
-    h += '<div class="card love fade"><h2>Beni düşündüğünde dokun</h2><button class="heart-btn" id="heart">💗</button>' +
-      '<p class="muted" id="lv">' + (lv ? "Bugün " + lv + " kez 💕" : "Her dokunuşun kalbime ulaşıyor") + '</p><p class="from-love" id="lv2"></p></div>' +
-      '<div class="card soru fade" id="soru"></div>';
+    // ---- Bu hafta ----
+    h += '<div class="sec">Bu hafta</div><div class="card hafta fade" id="hafta"></div>';
 
     // Geçmiş notlar
     if (idx > 0 && notes.length) {
@@ -228,8 +235,9 @@
     };
     if (window.KALP) KALP.paint();
     if (window.SORU) SORU.paint();
+    if (window.BUGUN) BUGUN.paint();
     app.querySelectorAll("[data-mood]").forEach(function (b) {
-      b.onclick = function () { state.mood[todayKey()] = +b.dataset.mood; save(); R.home(); bindTabs(); };
+      b.onclick = function () { state.mood[todayKey()] = +b.dataset.mood; save(); R.home(); bindTabs(); if (window.BUGUN) BUGUN.mood(); };
     });
     app.querySelectorAll("[data-past]").forEach(function (b) {
       b.onclick = function () { reader(notes[+b.dataset.past], (+b.dataset.past + 1) + ". günün notu"); };
@@ -325,7 +333,7 @@
     });
     app.querySelectorAll("canvas.scratch").forEach(scratch);
   };
-  function scratch(cv) {
+  function scratch(cv, done) {
     var i = +cv.dataset.sc, box = cv.parentNode, w = box.offsetWidth, hh = box.offsetHeight, dpr = window.devicePixelRatio || 1;
     cv.width = w * dpr; cv.height = hh * dpr;
     var ctx = cv.getContext("2d");
@@ -351,7 +359,7 @@
     }
     function reveal() {
       down = false; cv.style.transition = "opacity .5s"; cv.style.opacity = 0;
-      state.coupons[i] = state.coupons[i] || {}; state.coupons[i].open = 1; save();
+      if (done) done(); else { state.coupons[i] = state.coupons[i] || {}; state.coupons[i].open = 1; save(); }
       hearts(box); setTimeout(function () { cv.remove(); }, 500);
     }
     cv.addEventListener("pointerdown", function (e) { down = true; draw(e); });
@@ -445,7 +453,7 @@
   function confettiHearts(el) { hearts(el); }
 
   // Oyun dosyası (games.js) için ortak yardımcılar
-  window.BZ = { get C() { return C; }, state: state, save: save, esc: esc, hearts: hearts, flower: flower, showTab: showTab, app: app };
+  window.BZ = { get C() { return C; }, state: state, save: save, esc: esc, hearts: hearts, flower: flower, scratch: scratch, showTab: showTab, app: app };
 
   // ---------- Başlangıç ----------
   if (state.pw) {

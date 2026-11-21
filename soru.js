@@ -140,6 +140,7 @@
       if (!v) { ta.focus(); return; }
       var r2 = rec(g); r2.ben = v.slice(0, 300); delete st.soruTaslak; trim(); B.save();
       paint(); B.hearts(box);
+      if (window.BUGUN) BUGUN.aktif();
       push(g).then(function () { K.notify("Günün sorusunu cevapladı 💬"); })
         .catch(function () { K.toast("İnternet gelince gönderilecek 🌸"); });
     };
