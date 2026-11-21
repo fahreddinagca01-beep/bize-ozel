@@ -1,0 +1,17 @@
+{
+  "name": "Bize Özel",
+  "short_name": "Bize Özel",
+  "description": "Sadece ikimize özel küçük bir uygulama.",
+  "lang": "tr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff5f8",
+  "theme_color": "#ffe3ec",
+  "icons": [
+    { "src": "bize-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "bize-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "bize-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
