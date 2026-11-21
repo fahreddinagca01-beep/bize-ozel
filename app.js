@@ -107,10 +107,49 @@
     return Math.floor((startOfDay(Date.now()) - startOfDay(new Date(C.baslangic + "T00:00").getTime())) / DAY);
   }
 
+  // Tanışmadan bu yana geçen süre ve sıradaki özel gün
+  function togetherParts() {
+    var s = new Date(C.tanisma), n = new Date();
+    var y = n.getFullYear() - s.getFullYear(), m = n.getMonth() - s.getMonth(), d = n.getDate() - s.getDate();
+    var hh = n.getHours() - s.getHours(), mi = n.getMinutes() - s.getMinutes();
+    if (mi < 0) { mi += 60; hh--; }
+    if (hh < 0) { hh += 24; d--; }
+    if (d < 0) { d += new Date(n.getFullYear(), n.getMonth(), 0).getDate(); m--; }
+    if (m < 0) { m += 12; y--; }
+    var ms = n - s;
+    return { y: y, m: m, d: d, days: Math.floor(ms / DAY), h: Math.floor(ms % DAY / 3600000), mi: Math.floor(ms % 3600000 / 60000), sec: Math.floor(ms % 60000 / 1000), s: s };
+  }
+  function pad(x) { return (x < 10 ? "0" : "") + x; }
+  function togetherTick(p) { return p.days.toLocaleString("tr-TR") + " gün · " + pad(p.h) + " sa " + pad(p.mi) + " dk " + pad(p.sec) + " sn"; }
+  function togetherHtml() {
+    var p = togetherParts(), today = startOfDay(Date.now());
+    if (isNaN(p.days) || p.days < 0) return "";
+    var parts = [];
+    if (p.y) parts.push('<div class="num"><b>' + p.y + '</b><small>yıl</small></div>');
+    parts.push('<div class="num"><b>' + p.m + '</b><small>ay</small></div>', '<div class="num"><b>' + p.d + '</b><small>gün</small></div>');
+    // Sıradaki özel gün: yıl dönümü ya da 100'ün katı olan gün, hangisi önceyse
+    var start = startOfDay(p.s.getTime()), dayNo = Math.round((today - start) / DAY);
+    var next100 = (Math.floor(dayNo / 100) + 1) * 100, t100 = start + next100 * DAY;
+    var ann = new Date(p.s); ann.setFullYear(new Date().getFullYear()); var tAnn = startOfDay(ann.getTime());
+    if (tAnn < today) { ann.setFullYear(ann.getFullYear() + 1); tAnn = startOfDay(ann.getTime()); }
+    var annNo = ann.getFullYear() - p.s.getFullYear(), msg;
+    if (tAnn === today) msg = "🎉 Bugün " + annNo + ". yıl dönümümüz!";
+    else if (dayNo % 100 === 0) msg = "🎉 Bugün " + dayNo.toLocaleString("tr-TR") + ". günümüz!";
+    else if (tAnn <= t100) msg = "💍 " + annNo + ". yıl dönümümüze " + Math.round((tAnn - today) / DAY) + " gün kaldı";
+    else msg = "✨ " + next100.toLocaleString("tr-TR") + ". günümüze " + Math.round((t100 - today) / DAY) + " gün kaldı";
+    return '<h2>Birlikte</h2><div class="nums">' + parts.join("") + '</div>' +
+      '<div class="tick" id="tick">' + togetherTick(p) + '</div>' +
+      '<div class="next">' + msg + '</div>' +
+      '<div class="since">' + p.s.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) + ' akşamından beri 💞</div>';
+  }
+
   R.home = function () {
     var idx = dayIndex(), notes = C.gunluk || [];
     var h = '<div class="hello fade">' + flower(54) + '<div><h1 class="script">' + greeting() + ' ' + esc(C.ad) + '</h1>' +
       '<p>' + esc(C.alt_yazi || "Bugün de aklımdasın.") + '</p></div></div>';
+
+    // Birlikte kaç gün
+    if (C.tanisma) h += '<div class="card together fade" id="together">' + togetherHtml() + '</div>';
 
     // Buluşma sayacı
     if (C.bulusma && !C.bulusma.tarih && C.bulusma.yer) {
@@ -164,7 +203,8 @@
     // Seni düşünüyorum
     var lv = state.love[todayKey()] || 0;
     h += '<div class="card love fade"><h2>Beni düşündüğünde dokun</h2><button class="heart-btn" id="heart">💗</button>' +
-      '<p class="muted" id="lv">' + (lv ? "Bugün " + lv + " kez 💕" : "Her dokunuşun kalbime ulaşıyor") + '</p><p class="from-love" id="lv2"></p></div>';
+      '<p class="muted" id="lv">' + (lv ? "Bugün " + lv + " kez 💕" : "Her dokunuşun kalbime ulaşıyor") + '</p><p class="from-love" id="lv2"></p></div>' +
+      '<div class="card soru fade" id="soru"></div>';
 
     // Geçmiş notlar
     if (idx > 0 && notes.length) {
@@ -187,6 +227,7 @@
       if (window.KALP) KALP.tap();
     };
     if (window.KALP) KALP.paint();
+    if (window.SORU) SORU.paint();
     app.querySelectorAll("[data-mood]").forEach(function (b) {
       b.onclick = function () { state.mood[todayKey()] = +b.dataset.mood; save(); R.home(); bindTabs(); };
     });
@@ -413,8 +454,11 @@
       .catch(function () { delete state.pw; save(); renderLock(false); });
   } else renderLock(false);
 
+  // "Birlikte" sayacı her saniye ilerler
+  setInterval(function () { var el = C && C.tanisma && app.querySelector("#tick"); if (el) el.textContent = togetherTick(togetherParts()); }, 1000);
+
   // Sayaç her dakika yenilenir
-  setInterval(function () { if (C && tab === "home" && !app.querySelector(".paper")) { R.home(); bindTabs(); } }, 60000);
+  setInterval(function () { if (C && tab === "home" && !app.querySelector(".paper") && !/^(TEXTAREA|INPUT)$/.test((document.activeElement || {}).tagName)) { R.home(); bindTabs(); } }, 60000);
 
   if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(function () {});
 })();

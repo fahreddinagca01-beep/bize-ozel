@@ -6,7 +6,7 @@
   "use strict";
   var B = window.BZ, SRV = "https://ntfy.sh/";
   var te = new TextEncoder(), DAY_KEEP = 40, NOTIFY_GAP = 10 * 60000;
-  var ch = null, es = null, pending = 0, timer = null;
+  var ch = null, es = null, pending = 0, timer = null, handlers = {}, opens = [];
 
   var st = B.state;
   if (!st.kalp) st.kalp = { seen: [], gelen: {}, son: "", bildirim: 0 };
@@ -45,21 +45,29 @@
     pending++;
     clearTimeout(timer); timer = setTimeout(flush, 2500);
   }
+  // Şifreli mesaj gönderir; diğer özellikler (ör. günün sorusu) "tip" alanıyla aynı kanalı kullanır
+  function send(obj) {
+    return channel().then(function (c) {
+      var iv = crypto.getRandomValues(new Uint8Array(12));
+      return crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, c.key, te.encode(JSON.stringify(obj))).then(function (ct) {
+        return fetch(SRV + c.veri, { method: "POST", body: "1." + b64(iv) + "." + b64(ct) });
+      }).then(function (r) { if (!r.ok) throw new Error(r.status); return c; });
+    });
+  }
+  // İsteğe bağlı ntfy uygulaması bildirimi: isimsiz kısa metin
+  function notify(text) {
+    return channel().then(function (c) {
+      return fetch(SRV, { method: "POST", body: JSON.stringify({ topic: c.bildir[other()], title: "Bize Özel", message: text, tags: ["sparkling_heart"] }) });
+    }).catch(function () {});
+  }
   function flush() {
     if (!pending || !st.pw) return;
     var n = pending; pending = 0;
-    channel().then(function (c) {
-      var iv = crypto.getRandomValues(new Uint8Array(12));
-      var body = te.encode(JSON.stringify({ k: me(), n: n, t: Date.now() }));
-      return crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, c.key, body).then(function (ct) {
-        return fetch(SRV + c.veri, { method: "POST", body: "1." + b64(iv) + "." + b64(ct) });
-      }).then(function (r) {
-        if (!r.ok) throw new Error(r.status);
-        if (Date.now() - (st.kalp.bildirim || 0) > NOTIFY_GAP) {
-          st.kalp.bildirim = Date.now(); B.save();
-          fetch(SRV, { method: "POST", body: JSON.stringify({ topic: c.bildir[other()], title: "Bize Özel", message: "Şu an seni düşünüyor 💗", tags: ["sparkling_heart"] }) }).catch(function () {});
-        }
-      });
+    send({ k: me(), n: n, t: Date.now() }).then(function () {
+      if (Date.now() - (st.kalp.bildirim || 0) > NOTIFY_GAP) {
+        st.kalp.bildirim = Date.now(); B.save();
+        notify("Şu an seni düşünüyor 💗");
+      }
     }).catch(function () { pending += n; clearTimeout(timer); timer = setTimeout(flush, 15000); });
   }
   window.addEventListener("online", flush);
@@ -77,6 +85,7 @@
       return crypto.subtle.decrypt({ name: "AES-GCM", iv: unb64(p[1]) }, c.key, unb64(p[2]));
     }).then(function (buf) {
       var d = JSON.parse(new TextDecoder().decode(buf));
+      if (d.tip) { if (d.k !== me() && handlers[d.tip]) handlers[d.tip](d, m); B.save(); return; }
       if (d.k === me() || !(d.n > 0)) { B.save(); return; }
       var dk = dayKey(m.time * 1000);
       k.gelen[dk] = (k.gelen[dk] || 0) + Math.min(d.n, 500);
@@ -96,6 +105,7 @@
       if (es && es.readyState !== 2) return;
       es = new EventSource(SRV + c.veri + "/sse?since=" + (st.kalp.son || "12h"));
       es.onmessage = function (e) { try { onMsg(JSON.parse(e.data)); } catch (x) {} };
+      opens.forEach(function (f) { try { f(); } catch (x) {} });
     });
   }
   // Telefon uykudan dönünce bağlantı kaldığı yerden yenilenir
@@ -128,5 +138,9 @@
     h2.oncontextmenu = function (e) { e.preventDefault(); };
   }
 
-  window.KALP = { tap: tap, paint: paint };
+  window.KALP = {
+    tap: tap, paint: paint, send: send, notify: notify, toast: toast, me: me, other: other, name: name, dayKey: dayKey,
+    // tip: mesaj türü; fn(veri, ntfyMesajı) karşı taraftan gelince çağrılır; open: her yeni bağlantıda çağrılır
+    on: function (tip, fn, open) { handlers[tip] = fn; if (open) opens.push(open); }
+  };
 })();

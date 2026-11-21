@@ -104,6 +104,30 @@ h1, h2, h3 { margin: 0; line-height: 1.2; }
 }
 .heart-btn:active { transform: scale(.92); }
 .from-love { margin: 0; font-weight: 800; color: var(--pink-deep); }
+
+/* Birlikte */
+.together { text-align: center; }
+.together .nums { display: flex; justify-content: center; gap: 10px; margin: 8px 0 10px; }
+.together .num { background: var(--rose); border-radius: 16px; min-width: 66px; padding: 8px 6px; color: var(--pink-deep); }
+.together .num b { display: block; font-size: 28px; font-weight: 800; line-height: 1.1; }
+.together .num small { font-size: 12px; font-weight: 700; }
+.together .tick { font-weight: 800; color: var(--pink-deep); font-variant-numeric: tabular-nums; }
+.together .next { margin-top: 8px; font-weight: 700; }
+.together .since { margin-top: 4px; color: var(--muted); font-size: 14px; }
+
+/* Günün sorusu */
+.soru .q { font-size: 20px; font-weight: 800; line-height: 1.35; margin: 4px 0 14px; color: #5a2a3a; }
+.soru textarea { width: 100%; box-sizing: border-box; border: 2px solid var(--rose); border-radius: 16px; padding: 12px 14px; font: inherit; font-size: 16px; resize: none; background: #fffafc; margin-bottom: 10px; }
+.soru textarea:focus { outline: none; border-color: var(--pink-deep); }
+.answers { display: grid; gap: 10px; }
+.ans { background: var(--rose); border-radius: 16px; padding: 10px 14px; }
+.ans:nth-child(2) { background: #fff4d6; }
+.ans small { font-weight: 800; color: var(--pink-deep); }
+.ans p { margin: 4px 0 0; white-space: pre-wrap; word-break: break-word; }
+.past-q { margin-top: 14px; }
+.past-q summary { cursor: pointer; font-weight: 800; color: var(--pink-deep); }
+.pq { display: grid; gap: 8px; padding: 12px 0; border-bottom: 1px dashed var(--rose); }
+.pq > small { color: var(--muted); }
 .burst { position: fixed; pointer-events: none; font-size: 26px; z-index: 60; animation: up 1.4s ease-out forwards; }
 @keyframes up { to { transform: translate(var(--dx), -220px) scale(1.4); opacity: 0; } }
 
