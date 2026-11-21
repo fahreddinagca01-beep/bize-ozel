@@ -258,7 +258,11 @@
     h += '<div class="card game-card fade"><div class="game-ico">🧠💗</div><div><b>Beni ne kadar tanıyorsun?</b><small>' +
       ((C.sorular || []).length) + ' sorudan her seferinde 10 tanesi gelir</small></div>' +
       (state.best !== undefined ? '<span class="best">En iyi: ' + state.best + '/10</span>' : "") + '<button class="btn" id="play">OYNA</button></div>';
-    h += '<div class="coupons">';
+    h += '<h2 class="sec">Oyunlar</h2><div class="games">' +
+      '<button class="gcard" data-g="puzzle"><span>🧩</span><b>Yapboz</b><small>Birlikte çözün</small></button>' +
+      '<button class="gcard" data-g="memory"><span>🃏</span><b>Hafıza</b><small>Sırayla eş bul</small></button>' +
+      '<button class="gcard" data-g="catcher"><span>🧺</span><b>Kalp yakala</b><small>Aynı anda yarışın</small></button></div>';
+    h += '<h2 class="sec">Sevgi kuponları</h2><div class="coupons">';
     K.forEach(function (k, i) {
       var st = state.coupons[i] || {};
       h += '<div class="coupon' + (st.used ? " used" : "") + '"><div class="c-inner"><span class="c-ico">' + esc(k.ikon || "🎟️") + '</span><b>' + esc(k.baslik) + '</b>' +
@@ -269,6 +273,7 @@
     app.innerHTML = h + '</div>' + tabbar();
     bindTabs();
     app.querySelector("#play").onclick = startQuiz;
+    app.querySelectorAll("[data-g]").forEach(function (b) { b.onclick = function () { if (window.GAMES) window.GAMES[b.dataset.g](); }; });
     app.querySelectorAll("[data-use]").forEach(function (b) {
       b.onclick = function () {
         if (b.dataset.confirm) { state.coupons[b.dataset.use].used = 1; save(); R.fun(); return; }
@@ -395,6 +400,9 @@
     }
   }
   function confettiHearts(el) { hearts(el); }
+
+  // Oyun dosyası (games.js) için ortak yardımcılar
+  window.BZ = { get C() { return C; }, state: state, save: save, esc: esc, hearts: hearts, flower: flower, showTab: showTab, app: app };
 
   // ---------- Başlangıç ----------
   if (state.pw) {

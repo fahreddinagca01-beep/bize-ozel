@@ -211,3 +211,53 @@ h1, h2, h3 { margin: 0; line-height: 1.2; }
 .special { min-height: 85vh; display: flex; flex-direction: column; justify-content: center; gap: 14px; text-align: center; }
 .special .sp-ico { font-size: 90px; animation: bob 2s ease-in-out infinite; }
 .special h1 { font-size: 44px; color: var(--pink-deep); }
+
+/* Oyunlar */
+.sec { font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--pink-deep); font-weight: 800; margin: 18px 4px 10px; }
+.games { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.gcard { border: none; background: var(--card); border-radius: 18px; padding: 14px 6px; box-shadow: var(--shadow); display: grid; justify-items: center; gap: 2px; }
+.gcard span { font-size: 34px; }
+.gcard b { font-size: 15px; }
+.gcard small { font-size: 11px; color: var(--muted); }
+.lobby { display: grid; gap: 12px; }
+.lobby .big-ico { font-size: 70px; text-align: center; }
+.join { display: flex; gap: 8px; margin-top: 10px; }
+.join input { flex: 1; min-width: 0; text-align: center; font-size: 22px; letter-spacing: .3em; padding: 10px; border-radius: 999px; border: 2px solid var(--line); outline: none; color: var(--text); }
+.join .btn { width: auto; padding: 12px 22px; }
+.room { font-size: 30px; letter-spacing: .2em; color: var(--pink-deep); }
+.g-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.g-head .back { margin: 0; }
+.g-head b { font-size: 18px; flex: 1; }
+.vs { font-size: 13px; color: var(--muted); font-weight: 700; text-align: right; }
+.board { display: grid; gap: 3px; background: var(--rose); padding: 3px; border-radius: 18px; aspect-ratio: 1; box-shadow: var(--shadow); }
+.board .tile { border: none; border-radius: 8px; background-color: #fff; aspect-ratio: 1; padding: 0; font-size: 24px; font-weight: 800; color: var(--pink-deep); transition: transform .15s; }
+.board .tile.sel { outline: 4px solid var(--pink-deep); transform: scale(.94); }
+.board.done { gap: 0; padding: 0; }
+.board.done .tile { border-radius: 0; }
+.sizes { display: flex; justify-content: center; gap: 8px; margin: 6px 0; }
+.sizes button { border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 14px; font-weight: 800; }
+.sizes button.on { border-color: var(--pink); background: var(--rose); color: var(--pink-dark); }
+.peek { margin-top: 10px; color: var(--muted); }
+.peek img { width: 100%; border-radius: 16px; margin-top: 8px; }
+.win { margin-top: 12px; }
+.scores { display: flex; justify-content: center; gap: 8px; margin-bottom: 8px; }
+.scores span { background: #fff; border-radius: 999px; padding: 6px 14px; font-weight: 800; box-shadow: 0 4px 12px rgba(224, 96, 126, .1); }
+.scores span.on { background: var(--pink-deep); color: #fff; }
+.mem { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.mcard { position: relative; aspect-ratio: 3 / 4; border: none; border-radius: 14px; padding: 0; background: none; perspective: 600px; }
+.mcard .front, .mcard .backside {
+  position: absolute; inset: 0; border-radius: 14px; display: grid; place-items: center; align-content: center;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden; transition: transform .35s; box-shadow: 0 4px 12px rgba(224, 96, 126, .15);
+}
+.mcard .front { background: #fff; font-size: 30px; transform: rotateY(180deg); }
+.mcard .front small { font-size: 10px; color: var(--muted); font-weight: 700; }
+.mcard .backside { background: linear-gradient(135deg, #ffc1d4, #f06c94); font-size: 26px; }
+.mcard.up .front { transform: rotateY(0); }
+.mcard.up .backside { transform: rotateY(-180deg); }
+.mcard.done .front { background: #fff3c4; }
+.arena { position: relative; height: 62vh; border-radius: 22px; overflow: hidden; background: linear-gradient(#fff5f8, #ffd9e5); box-shadow: var(--shadow); touch-action: none; }
+.arena canvas { width: 100%; height: 100%; display: block; }
+.overlay { position: absolute; inset: 0; display: none; place-items: center; background: rgba(255, 245, 248, .75); }
+.overlay > b { font-size: 90px; color: var(--pink-deep); font-weight: 800; }
+.ov-card { background: #fff; border-radius: 22px; padding: 20px; box-shadow: var(--shadow); text-align: center; width: 85%; display: grid; gap: 10px; }
+.toast { position: fixed; left: 50%; top: 20px; transform: translateX(-50%); background: var(--pink-deep); color: #fff; padding: 10px 18px; border-radius: 999px; z-index: 90; font-weight: 800; }
