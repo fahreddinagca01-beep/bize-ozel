@@ -102,6 +102,7 @@ h1, h2, h3 { margin: 0; line-height: 1.2; }
   background: radial-gradient(circle at 35% 30%, #ffc1d4, var(--pink-deep)); box-shadow: 0 10px 24px rgba(224, 96, 126, .4);
 }
 .heart-btn:active { transform: scale(.92); }
+.from-love { margin: 0; font-weight: 800; color: var(--pink-deep); }
 .burst { position: fixed; pointer-events: none; font-size: 26px; z-index: 60; animation: up 1.4s ease-out forwards; }
 @keyframes up { to { transform: translate(var(--dx), -220px) scale(1.4); opacity: 0; } }
 

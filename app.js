@@ -164,7 +164,7 @@
     // Seni düşünüyorum
     var lv = state.love[todayKey()] || 0;
     h += '<div class="card love fade"><h2>Beni düşündüğünde dokun</h2><button class="heart-btn" id="heart">💗</button>' +
-      '<p class="muted" id="lv">' + (lv ? "Bugün " + lv + " kez 💕" : "Her dokunuşun kalbime ulaşıyor") + '</p></div>';
+      '<p class="muted" id="lv">' + (lv ? "Bugün " + lv + " kez 💕" : "Her dokunuşun kalbime ulaşıyor") + '</p><p class="from-love" id="lv2"></p></div>';
 
     // Geçmiş notlar
     if (idx > 0 && notes.length) {
@@ -184,7 +184,9 @@
       app.querySelector("#lv").textContent = "Bugün " + state.love[todayKey()] + " kez 💕";
       hearts(e.currentTarget);
       try { if (navigator.vibrate) navigator.vibrate(30); } catch (x) {}
+      if (window.KALP) KALP.tap();
     };
+    if (window.KALP) KALP.paint();
     app.querySelectorAll("[data-mood]").forEach(function (b) {
       b.onclick = function () { state.mood[todayKey()] = +b.dataset.mood; save(); R.home(); bindTabs(); };
     });
