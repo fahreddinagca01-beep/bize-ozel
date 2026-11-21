@@ -112,13 +112,20 @@
     if (!el) return;
     var n = st.kalp.gelen[dayKey(Date.now())] || 0;
     el.textContent = n ? name(other()) + " bugün seni " + n + " kez düşündü 💗" : name(other()) + " seni düşündüğünde burada görünecek 🌸";
-    var h2 = B.app.querySelector(".love h2"), taps = 0, tt = null;
-    if (h2) h2.onclick = function () {
-      taps++; clearTimeout(tt); tt = setTimeout(function () { taps = 0; }, 2000);
-      if (taps < 5) return;
+    // Telefonun sahibini değiştirme: başlığa 5 kez dokun ya da 1,5 sn basılı tut
+    var h2 = B.app.querySelector(".love h2"), taps = 0, tt = null, hold = null;
+    if (!h2) return;
+    function swap() {
       taps = 0; st.ben = other(); st.kalp.gelen = {}; B.save();
       toast("Bu telefon: " + name(me())); paint();
+    }
+    h2.onclick = function () {
+      taps++; clearTimeout(tt); tt = setTimeout(function () { taps = 0; }, 2000);
+      if (taps >= 5) swap();
     };
+    h2.onpointerdown = function () { clearTimeout(hold); hold = setTimeout(swap, 1500); };
+    h2.onpointerup = h2.onpointerleave = h2.onpointercancel = function () { clearTimeout(hold); };
+    h2.oncontextmenu = function (e) { e.preventDefault(); };
   }
 
   window.KALP = { tap: tap, paint: paint };

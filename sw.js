@@ -1,6 +1,6 @@
 // Çevrim dışı çalışma: ağ varsa güncel dosya gelir ve önbelleğe yazılır; ağ yoksa önbellek kullanılır.
 // Kod veya içerik değişince CACHE sürümünü artır.
-var CACHE = "bize-ozel-v5";
+var CACHE = "bize-ozel-v6";
 var FILES = ["./", "index.html", "style.css", "app.js", "games.js", "kalp.js", "icerik.enc.json", "manifest.webmanifest", "icon.svg", "bize-180.png", "bize-192.png", "bize-512.png"];
 
 self.addEventListener("install", function (e) {
