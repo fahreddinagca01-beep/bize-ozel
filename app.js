@@ -304,34 +304,27 @@
 
   // ---------- Sürpriz: kazı-kazan kuponlar ve oyun ----------
   R.fun = function () {
-    var K = C.kuponlar || [];
-    var h = '<h1 class="page-title">Sürprizler</h1><p class="page-sub">Kazı, bak, buluşunca kullan 💝</p>';
-    h += '<div class="card game-card fade"><div class="game-ico">🧠💗</div><div><b>Beni ne kadar tanıyorsun?</b><small>' +
-      ((C.sorular || []).length) + ' sorudan her seferinde 10 tanesi gelir</small></div>' +
-      (state.best !== undefined ? '<span class="best">En iyi: ' + state.best + '/10</span>' : "") + '<button class="btn" id="play">OYNA</button></div>';
-    h += '<h2 class="sec">Oyunlar</h2><div class="games">' +
+    var nq = (C.sorular || []).length;
+    var h = '<header class="top fade"><h1 class="page-title">Sürprizler</h1><p class="page-sub">Çark, oyunlar ve sevgi kuponları 💝</p></header>';
+    // ---- Bugün ----
+    h += '<div class="sec">Bugün</div><div class="card cark fade" id="cark"></div>';
+    // ---- Oyunlar ----
+    h += '<div class="sec">Oyunlar</div>';
+    if (nq) h += '<div class="card quiz-card fade"><div class="qc-top"><span class="qc-ico">🧠</span><div><b>Beni ne kadar tanıyorsun?</b><small>' +
+      nq + ' sorudan her seferinde 10 tanesi gelir</small></div></div>' +
+      (state.best !== undefined ? '<div class="qc-best"><span>🏆 En iyi</span><b>' + state.best + ' / 10</b><i><em style="width:' + state.best * 10 + '%"></em></i></div>' : "") +
+      '<button class="btn" id="play">' + (state.best !== undefined ? "Yeniden oyna" : "Oyna") + '</button></div>';
+    h += '<div class="games fade">' +
       '<button class="gcard" data-g="puzzle"><span>🧩</span><b>Yapboz</b><small>Birlikte çözün</small></button>' +
       '<button class="gcard" data-g="memory"><span>🃏</span><b>Hafıza</b><small>Sırayla eş bul</small></button>' +
       '<button class="gcard" data-g="catcher"><span>🧺</span><b>Kalp yakala</b><small>Aynı anda yarışın</small></button></div>';
-    h += '<h2 class="sec">Sevgi kuponları</h2><div class="coupons">';
-    K.forEach(function (k, i) {
-      var st = state.coupons[i] || {};
-      h += '<div class="coupon' + (st.used ? " used" : "") + '"><div class="c-inner"><span class="c-ico">' + esc(k.ikon || "🎟️") + '</span><b>' + esc(k.baslik) + '</b>' +
-        (k.metin ? '<small>' + esc(k.metin) + '</small>' : "") +
-        (st.used ? '<span class="stamp">Kullanıldı</span>' : '<button class="use" data-use="' + i + '">Kullan</button>') + '</div>' +
-        (st.open ? "" : '<canvas class="scratch" data-sc="' + i + '"></canvas>') + '</div>';
-    });
-    app.innerHTML = h + '</div>' + tabbar();
+    // ---- Kuponlar ----
+    if ((C.kuponlar || []).length) h += '<div class="sec">Sevgi kuponları</div><div class="fade" id="kuponlar"></div>';
+    app.innerHTML = h + tabbar();
     bindTabs();
-    app.querySelector("#play").onclick = startQuiz;
+    var pl = app.querySelector("#play"); if (pl) pl.onclick = startQuiz;
     app.querySelectorAll("[data-g]").forEach(function (b) { b.onclick = function () { if (window.GAMES) window.GAMES[b.dataset.g](); }; });
-    app.querySelectorAll("[data-use]").forEach(function (b) {
-      b.onclick = function () {
-        if (b.dataset.confirm) { state.coupons[b.dataset.use].used = 1; save(); R.fun(); return; }
-        b.dataset.confirm = 1; b.textContent = "Emin misin? Dokun";
-      };
-    });
-    app.querySelectorAll("canvas.scratch").forEach(scratch);
+    if (window.SURPRIZ) SURPRIZ.paint();
   };
   function scratch(cv, done) {
     var i = +cv.dataset.sc, box = cv.parentNode, w = box.offsetWidth, hh = box.offsetHeight, dpr = window.devicePixelRatio || 1;

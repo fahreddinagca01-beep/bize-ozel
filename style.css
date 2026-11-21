@@ -402,3 +402,50 @@ body.t-gece .cele-box { background: var(--card); }
 body.t-gece .celebrate { background: rgba(29, 17, 36, .7); }
 body.t-gece .lock input { background: var(--card); }
 .count:not(.slim) h2 { color: rgba(255, 255, 255, .9); }
+
+/* ================= Sürpriz yenilemesi (2026-11-21) ================= */
+.cark .muted.center { margin: 0 0 6px; }
+.wheel-wrap { position: relative; width: min(260px, 78vw); margin: 8px auto 14px; }
+.wheel-pin { position: absolute; left: 50%; top: -10px; transform: translateX(-50%); z-index: 2; color: var(--pink-deep); font-size: 26px; text-shadow: 0 2px 4px rgba(0, 0, 0, .15); }
+.wheel { position: relative; width: 100%; aspect-ratio: 1; border-radius: 50%; border: 6px solid #fff; box-shadow: 0 10px 28px rgba(224, 96, 126, .25), inset 0 0 0 2px rgba(240, 108, 148, .25); }
+.wheel span { position: absolute; inset: 0; display: flex; justify-content: center; pointer-events: none; }
+.wheel span i { font-style: normal; font-size: 26px; margin-top: 12%; }
+.wheel-hub { position: absolute; left: 50%; top: 50%; width: 22%; height: 22%; transform: translate(-50%, -50%); border-radius: 50%; background: #fff; display: grid; place-items: center; font-size: 22px; box-shadow: 0 2px 8px rgba(0, 0, 0, .12); }
+.plan { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 18px; background: var(--grad); color: #fff; }
+.plan > span { font-size: 34px; }
+.plan small { display: block; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; opacity: .85; }
+.plan b { font-size: 17px; line-height: 1.35; }
+.cark .plan + .muted { margin: 10px 0 0; }
+
+.quiz-card { background: linear-gradient(135deg, #fff, #fff3f7); }
+.qc-top { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+.qc-ico { font-size: 30px; width: 56px; height: 56px; flex: none; display: grid; place-items: center; border-radius: 16px; background: var(--rose); }
+.qc-top b { display: block; font-size: 17px; }
+.qc-top small { color: var(--muted); font-size: 13px; }
+.qc-best { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center; margin-bottom: 12px; font-weight: 800; font-size: 14px; color: var(--muted); }
+.qc-best b { color: var(--pink-deep); }
+.qc-best i { grid-column: 1 / -1; height: 8px; border-radius: 99px; background: var(--rose); overflow: hidden; }
+.qc-best em { display: block; height: 100%; background: var(--grad); border-radius: 99px; }
+.games { margin-bottom: 12px; }
+.gcard { border: 1px solid rgba(246, 211, 223, .75); padding: 16px 6px; transition: transform .12s; }
+.gcard:active { transform: scale(.96); }
+
+.k-head { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.k-head > div:not(.k-bar) { background: var(--card); border-radius: 16px; padding: 10px; text-align: center; box-shadow: var(--shadow); }
+.k-head b { display: block; font-size: 22px; color: var(--pink-dark); line-height: 1.2; }
+.k-head small { color: var(--muted); font-weight: 700; font-size: 12px; }
+.k-bar { grid-column: 1 / -1; height: 8px; border-radius: 99px; background: var(--rose); overflow: hidden; }
+.k-bar span { display: block; height: 100%; background: var(--grad); border-radius: 99px; transition: width .4s; }
+#kuponlar .page-sub { margin: 4px 2px 12px; font-size: 14px; }
+.coupon { border: 2px dashed var(--rose); transition: transform .12s; }
+.coupon.used { opacity: .55; filter: grayscale(.4); }
+.k-tag { margin-top: 4px; padding: 3px 10px; border-radius: 999px; background: #f6eef2; color: var(--muted); font-weight: 800; font-size: 12px; }
+.k-tag.on { background: #fff1d6; color: #b7791f; }
+
+body.t-gece .wheel { border-color: var(--card); }
+body.t-gece .wheel-hub { background: var(--card); }
+body.t-gece .quiz-card { background: var(--card); }
+body.t-gece .k-head > div:not(.k-bar), body.t-gece .coupon { background: var(--card); border-color: var(--line); }
+body.t-gece .k-head b, body.t-gece .qc-best b { color: #ffb3c9; }
+body.t-gece .k-tag { background: #3a2442; }
+body.t-gece .k-tag.on { background: #4a3a1c; color: #ffd27a; }

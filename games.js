@@ -11,6 +11,7 @@
   // ---------- Kimlik ----------
   function myName() { var C = B.C; return B.state.me === "faho" ? (C.benim_adim || "Faho") : (C.ad || "Hayatım"); }
   function askWho(next) {
+    if (!B.state.me && B.state.ben) { B.state.me = B.state.ben === "faho" ? "faho" : "hayatim"; B.save(); }
     if (B.state.me) return next();
     var C = B.C;
     app.innerHTML = '<div class="lock fade">' + B.flower(80) + '<h1 class="script">Sen kimsin?</h1><p>Oyunlarda adın böyle görünecek.</p>' +
