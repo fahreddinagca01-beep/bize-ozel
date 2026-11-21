@@ -10,7 +10,7 @@
 
   function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
   var state = load();
-  ["opened", "todos", "added", "love"].forEach(function (k) { if (!state[k]) state[k] = k === "added" ? [] : {}; });
+  ["opened", "todos", "added", "love", "coupons", "special", "mood"].forEach(function (k) { if (!state[k]) state[k] = k === "added" ? [] : {}; });
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
 
   function esc(s) {
@@ -73,7 +73,7 @@
       if (!v) return;
       app.querySelector("#msg").textContent = "Açılıyor…";
       getEnc().then(function (enc) { return decrypt(v, enc); }).then(function (c) {
-        C = c; state.pw = v; save(); showTab("home");
+        C = c; state.pw = v; save(); start();
       }).catch(function () {
         var box = app.querySelector(".lock"); box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake");
         app.querySelector("#msg").textContent = "Şifre olmadı, bir daha dener misin? 🌸";
@@ -86,7 +86,7 @@
   // ---------- Sekmeler ----------
   var tab = "home";
   function tabbar() {
-    var t = [["home", "🌼", "Bugün"], ["letters", "💌", "Mektuplar"], ["memories", "📸", "Anılar"], ["todo", "✨", "Planlar"]];
+    var t = [["home", "🌼", "Bugün"], ["letters", "💌", "Mektuplar"], ["fun", "🎁", "Sürpriz"], ["memories", "📸", "Anılar"], ["todo", "✨", "Planlar"]];
     return '<nav class="tabbar">' + t.map(function (x) {
       return '<button data-tab="' + x[0] + '" class="' + (tab === x[0] ? "on" : "") + '"><span>' + x[1] + '</span><small>' + x[2] + '</small></button>';
     }).join("") + '</nav>';
@@ -146,6 +146,21 @@
       else if (idx + 1 < notes.length) h += '<p class="locked-note">Yarın yeni bir not seni bekliyor 🌼</p>';
     }
 
+    // Bugün nasılsın?
+    var moods = C.ruh_halleri || [];
+    if (moods.length) {
+      var mk = state.mood[todayKey()];
+      h += '<div class="card fade"><h2>Bugün nasılsın?</h2><div class="moods">' + moods.map(function (m, i) {
+        return '<button class="mood' + (mk === i ? " on" : "") + '" data-mood="' + i + '"><span>' + esc(m.ikon) + '</span><small>' + esc(m.ad) + '</small></button>';
+      }).join("") + '</div>';
+      if (mk !== undefined && moods[mk]) {
+        h += '<div class="mood-msg fade">' + esc(moods[mk].mesaj) + '</div>';
+        if (C.whatsapp) h += '<a class="btn soft wa" target="_blank" rel="noopener" href="https://wa.me/' + esc(C.whatsapp) + '?text=' +
+          encodeURIComponent("Bugün kendimi " + moods[mk].ad.toLocaleLowerCase("tr") + " hissediyorum " + moods[mk].ikon) + '">💬 ' + esc(C.benim_adim || "Ona") + '\'ya haber ver</a>';
+      }
+      h += '</div>';
+    }
+
     // Seni düşünüyorum
     var lv = state.love[todayKey()] || 0;
     h += '<div class="card love fade"><h2>Beni düşündüğünde dokun</h2><button class="heart-btn" id="heart">💗</button>' +
@@ -170,6 +185,9 @@
       hearts(e.currentTarget);
       try { if (navigator.vibrate) navigator.vibrate(30); } catch (x) {}
     };
+    app.querySelectorAll("[data-mood]").forEach(function (b) {
+      b.onclick = function () { state.mood[todayKey()] = +b.dataset.mood; save(); R.home(); bindTabs(); };
+    });
     app.querySelectorAll("[data-past]").forEach(function (b) {
       b.onclick = function () { reader(notes[+b.dataset.past], (+b.dataset.past + 1) + ". günün notu"); };
     });
@@ -233,6 +251,136 @@
     app.querySelector("#new").onkeydown = function (e) { if (e.key === "Enter") add(); };
   };
 
+  // ---------- Sürpriz: kazı-kazan kuponlar ve oyun ----------
+  R.fun = function () {
+    var K = C.kuponlar || [];
+    var h = '<h1 class="page-title">Sürprizler</h1><p class="page-sub">Kazı, bak, buluşunca kullan 💝</p>';
+    h += '<div class="card game-card fade"><div class="game-ico">🧠💗</div><div><b>Beni ne kadar tanıyorsun?</b><small>' +
+      ((C.sorular || []).length) + ' sorudan her seferinde 10 tanesi gelir</small></div>' +
+      (state.best !== undefined ? '<span class="best">En iyi: ' + state.best + '/10</span>' : "") + '<button class="btn" id="play">OYNA</button></div>';
+    h += '<div class="coupons">';
+    K.forEach(function (k, i) {
+      var st = state.coupons[i] || {};
+      h += '<div class="coupon' + (st.used ? " used" : "") + '"><div class="c-inner"><span class="c-ico">' + esc(k.ikon || "🎟️") + '</span><b>' + esc(k.baslik) + '</b>' +
+        (k.metin ? '<small>' + esc(k.metin) + '</small>' : "") +
+        (st.used ? '<span class="stamp">Kullanıldı</span>' : '<button class="use" data-use="' + i + '">Kullan</button>') + '</div>' +
+        (st.open ? "" : '<canvas class="scratch" data-sc="' + i + '"></canvas>') + '</div>';
+    });
+    app.innerHTML = h + '</div>' + tabbar();
+    bindTabs();
+    app.querySelector("#play").onclick = startQuiz;
+    app.querySelectorAll("[data-use]").forEach(function (b) {
+      b.onclick = function () {
+        if (b.dataset.confirm) { state.coupons[b.dataset.use].used = 1; save(); R.fun(); return; }
+        b.dataset.confirm = 1; b.textContent = "Emin misin? Dokun";
+      };
+    });
+    app.querySelectorAll("canvas.scratch").forEach(scratch);
+  };
+  function scratch(cv) {
+    var i = +cv.dataset.sc, box = cv.parentNode, w = box.offsetWidth, hh = box.offsetHeight, dpr = window.devicePixelRatio || 1;
+    cv.width = w * dpr; cv.height = hh * dpr;
+    var ctx = cv.getContext("2d");
+    ctx.scale(dpr, dpr);
+    var g = ctx.createLinearGradient(0, 0, w, hh);
+    g.addColorStop(0, "#ffc1d4"); g.addColorStop(1, "#f06c94");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, hh);
+    ctx.fillStyle = "rgba(255,255,255,.9)"; ctx.font = "700 16px Nunito, sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("✨ Kazı ✨", w / 2, hh / 2 + 6);
+    ctx.globalCompositeOperation = "destination-out";
+    var down = false, moves = 0;
+    function at(e) { var r = cv.getBoundingClientRect(), t = e.touches ? e.touches[0] : e; return [t.clientX - r.left, t.clientY - r.top]; }
+    function draw(e) {
+      if (!down) return;
+      e.preventDefault();
+      var pt = at(e); ctx.beginPath(); ctx.arc(pt[0], pt[1], 22, 0, Math.PI * 2); ctx.fill();
+      if (++moves % 10 === 0 && cleared() > 0.5) reveal();
+    }
+    function cleared() {
+      var d = ctx.getImageData(0, 0, cv.width, cv.height).data, n = 0, tot = 0;
+      for (var k = 3; k < d.length; k += 64) { tot++; if (d[k] === 0) n++; }
+      return n / tot;
+    }
+    function reveal() {
+      down = false; cv.style.transition = "opacity .5s"; cv.style.opacity = 0;
+      state.coupons[i] = state.coupons[i] || {}; state.coupons[i].open = 1; save();
+      hearts(box); setTimeout(function () { cv.remove(); }, 500);
+    }
+    cv.addEventListener("pointerdown", function (e) { down = true; draw(e); });
+    cv.addEventListener("pointermove", draw);
+    window.addEventListener("pointerup", function () { down = false; });
+    cv.addEventListener("touchmove", function (e) { e.preventDefault(); }, { passive: false });
+  }
+
+  // Bilgi yarışması
+  var Q = null;
+  function shuffled(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function startQuiz() {
+    var all = C.sorular || [];
+    if (!all.length) return;
+    Q = { list: shuffled(all).slice(0, 10), pos: 0, score: 0 };
+    quizStep();
+  }
+  function quizStep() {
+    window.scrollTo(0, 0);
+    if (Q.pos >= Q.list.length) return quizEnd();
+    var q = Q.list[Q.pos];
+    var opts = q.secenekler.map(function (o, i) { return { t: o, i: i }; });
+    if (!q.sabit) opts = shuffled(opts);
+    app.innerHTML = '<button class="back" id="back" aria-label="Çık">✕</button><div class="quiz fade">' +
+      '<div class="q-bar"><span style="width:' + Math.round(Q.pos / Q.list.length * 100) + '%"></span></div>' +
+      '<div class="q-meta">' + (Q.pos + 1) + ' / ' + Q.list.length + (q.tur ? ' · ' + esc(q.tur) : "") + '</div>' +
+      '<h2 class="q-text">' + esc(q.soru) + '</h2><div class="q-opts">' + opts.map(function (o) {
+        return '<button class="q-opt" data-i="' + o.i + '">' + esc(o.t) + '</button>';
+      }).join("") + '</div><div id="q-fb"></div></div>';
+    app.querySelector("#back").onclick = function () { Q = null; showTab("fun"); };
+    app.querySelectorAll(".q-opt").forEach(function (b) {
+      b.onclick = function () {
+        var i = +b.dataset.i, ok = q.dogru === -1 || i === q.dogru;
+        if (ok) Q.score++;
+        app.querySelectorAll(".q-opt").forEach(function (x) {
+          x.disabled = true;
+          var xi = +x.dataset.i;
+          if (q.dogru === -1 ? xi === i : xi === q.dogru) x.classList.add("right");
+          else if (xi === i) x.classList.add("wrong");
+        });
+        if (ok) hearts(b);
+        app.querySelector("#q-fb").innerHTML = '<div class="q-react ' + (ok ? "ok" : "no") + ' fade">' +
+          esc(ok ? (q.tepki || "Doğru! Beni çok iyi tanıyorsun 💗") : (q.tepki_yanlis || "Olmadı ama seni yine de çok seviyorum 😄")) + '</div>' +
+          '<button class="btn" id="next">' + (Q.pos + 1 < Q.list.length ? "Sonraki soru" : "Sonucu gör") + '</button>';
+        app.querySelector("#next").onclick = function () { Q.pos++; quizStep(); };
+      };
+    });
+  }
+  function quizEnd() {
+    var s = Q.score, n = Q.list.length;
+    if (state.best === undefined || s > state.best) { state.best = s; save(); }
+    var t = s >= 9 ? ["Faho uzmanı 🏆", "Beni benden iyi tanıyorsun!"] : s >= 7 ? ["Kalp okuyucu 💞", "Çok az kaldı, neredeyse kusursuz."] :
+      s >= 4 ? ["Tatlı tahminci 🌸", "Adana'da eksikleri birlikte tamamlarız 😄"] : ["Sürprizlerle dolu 🙈", "Demek ki daha çok konuşmamız lazım!"];
+    app.innerHTML = '<div class="quiz center fade">' + flower(90) + '<h1 class="page-title">' + s + ' / ' + n + '</h1>' +
+      '<h2 class="q-text">' + t[0] + '</h2><p class="note-text">' + t[1] + '</p>' +
+      '<button class="btn" id="again">Tekrar oyna</button><br><button class="btn soft" id="out">Sürprizlere dön</button></div>';
+    hearts(app.querySelector(".page-title"));
+    app.querySelector("#again").onclick = startQuiz;
+    app.querySelector("#out").onclick = function () { Q = null; showTab("fun"); };
+  }
+
+  // ---------- Özel günler ----------
+  function start() {
+    var d = new Date(), md = String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    var sp = (C.ozel_gunler || []).filter(function (x) { return x.tarih === md; })[0];
+    if (sp && !state.special[todayKey()]) {
+      app.innerHTML = '<div class="special fade"><div class="sp-ico">' + esc(sp.ikon || "🎉") + '</div><h1 class="script">' + esc(sp.baslik) + '</h1>' +
+        '<div class="note-text">' + esc(sp.metin) + '</div><div class="sign">' + esc(C.imza || "") + '</div>' +
+        '<button class="btn" id="spok">Teşekkürler 💗</button></div>';
+      var el = app.querySelector(".sp-ico");
+      [0, 400, 800, 1300].forEach(function (ms) { setTimeout(function () { hearts(el); }, ms); });
+      app.querySelector("#spok").onclick = function () { state.special[todayKey()] = 1; save(); showTab("home"); };
+      return;
+    }
+    showTab("home");
+  }
+
   // ---------- Kalp efektleri ----------
   function hearts(el) {
     var r = el.getBoundingClientRect(), icons = ["💗", "💕", "💖", "🌸", "🌼"];
@@ -251,7 +399,7 @@
   // ---------- Başlangıç ----------
   if (state.pw) {
     getEnc().then(function (enc) { return decrypt(state.pw, enc); })
-      .then(function (c) { C = c; showTab("home"); })
+      .then(function (c) { C = c; start(); })
       .catch(function () { delete state.pw; save(); renderLock(false); });
   } else renderLock(false);
 
