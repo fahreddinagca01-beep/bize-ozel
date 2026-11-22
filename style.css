@@ -449,3 +449,34 @@ body.t-gece .k-head > div:not(.k-bar), body.t-gece .coupon { background: var(--c
 body.t-gece .k-head b, body.t-gece .qc-best b { color: #ffb3c9; }
 body.t-gece .k-tag { background: #3a2442; }
 body.t-gece .k-tag.on { background: #4a3a1c; color: #ffd27a; }
+
+/* ================= Posta: birbirine not ve mektup (2026-11-22) ================= */
+.write input, .write textarea { width: 100%; box-sizing: border-box; border: 2px solid var(--rose); border-radius: 16px; padding: 12px 14px; font-size: 16px; background: #fffafc; color: var(--text); margin-bottom: 10px; resize: vertical; }
+.write input:focus, .write textarea:focus { outline: none; border-color: var(--pink-deep); }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 4px; border-radius: 999px; background: #f6eef2; margin-bottom: 12px; }
+.seg button { border: none; background: none; border-radius: 999px; padding: 9px 8px; font-weight: 800; font-size: 14px; color: var(--muted); }
+.seg button.on { background: var(--card); color: var(--pink-deep); box-shadow: var(--shadow); }
+.zarf-chips { display: flex; gap: 6px; overflow-x: auto; margin: -2px 0 10px; padding-bottom: 2px; scrollbar-width: none; }
+.zarf-chips button { flex: none; border: 1px solid var(--rose); background: var(--card); color: var(--pink-dark); border-radius: 999px; padding: 5px 11px; font-size: 12px; font-weight: 700; }
+.inbox, .sent { display: grid; gap: 8px; margin-bottom: 12px; }
+.mail { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; border: 1px solid rgba(246, 211, 223, .75); background: var(--card); color: var(--text); border-radius: 18px; padding: 12px 14px; box-shadow: var(--shadow); }
+.mail.new { border-color: var(--pink); background: linear-gradient(135deg, #fff, #fff0f5); }
+.m-ico { font-size: 28px; flex: none; }
+.m-body { flex: 1; min-width: 0; display: grid; }
+.m-body b { font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-body small { color: var(--muted); font-size: 12px; }
+.m-dot { flex: none; background: var(--pink-deep); color: #fff; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px; }
+.m-st { flex: none; font-size: 12px; font-weight: 800; color: var(--muted); }
+.m-st.ok { color: var(--pink-deep); }
+.m-st.wait { color: #b7791f; }
+.sent summary { cursor: pointer; font-weight: 800; color: var(--muted); padding: 6px 4px; }
+.new-mail { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; border: none; background: var(--grad); color: #fff; animation: pop .4s cubic-bezier(.2, 1.6, .4, 1); }
+.nm-ico { font-size: 36px; }
+.new-mail small { display: block; font-size: 12px; font-weight: 800; opacity: .9; }
+.new-mail b { font-size: 17px; }
+.nm-go { margin-left: auto; background: rgba(255, 255, 255, .25); padding: 6px 14px; border-radius: 999px; font-weight: 800; }
+.tabbar button { position: relative; }
+.tabbar button.dot::after { content: ""; position: absolute; top: 6px; right: 14px; width: 9px; height: 9px; border-radius: 50%; background: #ff3b6b; box-shadow: 0 0 0 2px #fff; }
+body.t-gece .write input, body.t-gece .write textarea, body.t-gece .mail, body.t-gece .zarf-chips button { background: var(--card); color: var(--text); border-color: var(--line); }
+body.t-gece .seg { background: #3a2442; }
+body.t-gece .mail.new { background: #3d2140; border-color: #ff8fb1; }

@@ -88,7 +88,8 @@
   function tabbar() {
     var t = [["home", "🌼", "Bugün"], ["letters", "💌", "Mektuplar"], ["fun", "🎁", "Sürpriz"], ["memories", "📸", "Anılar"], ["todo", "✨", "Planlar"]];
     return '<nav class="tabbar">' + t.map(function (x) {
-      return '<button data-tab="' + x[0] + '" class="' + (tab === x[0] ? "on" : "") + '"><span>' + x[1] + '</span><small>' + x[2] + '</small></button>';
+      var dot = x[0] === "letters" && window.POSTA && POSTA.unread() ? " dot" : "";
+      return '<button data-tab="' + x[0] + '" class="' + (tab === x[0] ? "on" : "") + dot + '"><span>' + x[1] + '</span><small>' + x[2] + '</small></button>';
     }).join("") + '</nav>';
   }
   function showTab(t) {
@@ -172,7 +173,7 @@
     }
 
     // ---- Şimdi ----
-    h += '<div class="sec">Şimdi</div>';
+    h += '<div class="sec">Şimdi</div><div id="postaHome"></div>';
     var lv = state.love[todayKey()] || 0;
     h += '<div class="card love fade"><h2>Beni düşündüğünde dokun</h2><button class="heart-btn" id="heart">💗</button>' +
       '<p class="muted" id="lv">' + (lv ? "Bugün " + lv + " kez 💕" : "Her dokunuşun kalbime ulaşıyor") + '</p><p class="from-love" id="lv2"></p></div>';
@@ -236,6 +237,7 @@
     if (window.KALP) KALP.paint();
     if (window.SORU) SORU.paint();
     if (window.BUGUN) BUGUN.paint();
+    if (window.POSTA) POSTA.badge();
     app.querySelectorAll("[data-mood]").forEach(function (b) {
       b.onclick = function () { state.mood[todayKey()] = +b.dataset.mood; save(); R.home(); bindTabs(); if (window.BUGUN) BUGUN.mood(); };
     });
@@ -249,7 +251,7 @@
     return '<div class="fade">' + (n.baslik ? '<div class="note-title">' + esc(n.baslik) + '</div>' : "") +
       '<div class="note-text">' + esc(n.metin) + '</div>' +
       (n.foto ? '<img class="note-photo" src="' + esc(n.foto) + '" alt="">' : "") +
-      '<div class="sign">' + esc(C.imza || "Seni seven") + '</div></div>';
+      '<div class="sign">' + esc(n.imza || C.imza || "Seni seven") + '</div></div>';
   }
   function reader(n, top) {
     window.scrollTo(0, 0);
@@ -260,13 +262,18 @@
 
   R.letters = function () {
     var L = C.mektuplar || [];
-    var h = '<h1 class="page-title">Mektuplar</h1><p class="page-sub">İhtiyacın olduğunda aç. Hepsi senin için yazıldı.</p><div class="letters fade">';
+    var faho = window.KALP && KALP.me() === "faho";
+    var h = '<h1 class="page-title">Mektuplar</h1><p class="page-sub">Birbirimize yazdıklarımız 💌</p><div id="posta"></div>';
+    if (L.length) h += '<div class="sec">' + (faho ? "Uygulamadaki mektupların" : esc(C.benim_adim || "Faho") + " sana yazdı") + '</div>' +
+      '<p class="page-sub">' + (faho ? "Onun telefonunda kapalı zarf olarak duruyor." : "İhtiyacın olduğunda aç. Hepsi senin için yazıldı.") + '</p>';
+    h += '<div class="letters fade">';
     L.forEach(function (m, i) {
       var o = state.opened["m" + i];
       h += '<button class="letter' + (o ? " opened" : "") + '" data-l="' + i + '"><span class="ico">' + esc(m.ikon || "💌") + '</span>' +
         '<b>' + esc(m.zarf) + '</b><small>' + (o ? "Açıldı" : "Kapalı zarf") + '</small></button>';
     });
     app.innerHTML = h + '</div>' + tabbar();
+    if (window.POSTA) { POSTA.paint(); POSTA.badge(); }
     app.querySelectorAll("[data-l]").forEach(function (b) {
       b.onclick = function () { var i = +b.dataset.l; state.opened["m" + i] = 1; save(); reader({ baslik: L[i].zarf, metin: L[i].metin, foto: L[i].foto }, "Mektup"); };
     });
@@ -446,7 +453,7 @@
   function confettiHearts(el) { hearts(el); }
 
   // Oyun dosyası (games.js) için ortak yardımcılar
-  window.BZ = { get C() { return C; }, state: state, save: save, esc: esc, hearts: hearts, flower: flower, scratch: scratch, showTab: showTab, app: app };
+  window.BZ = { get C() { return C; }, state: state, save: save, esc: esc, hearts: hearts, flower: flower, scratch: scratch, showTab: showTab, reader: reader, app: app };
 
   // ---------- Başlangıç ----------
   if (state.pw) {
